@@ -581,7 +581,7 @@ function login()
     $pw_hash = md5($form_vars['pw']);
 
     /** @noinspection SqlDialectInspection */
-    $sql = 'SELECT * FROM `myprogramo` WHERE user_name = :user_name AND password = :pw_hash;';
+    $sql = 'SELECT * FROM myprogramo WHERE user_name = :user_name AND password = :pw_hash;';
     $params = array(':user_name' => $user_name, ':pw_hash' => $pw_hash);
     $debugSQL = db_parseSQL($sql, $params);
     //save_file(_LOG_PATH_ . 'login.sql.txt', $debugSQL);
@@ -607,14 +607,14 @@ function login()
         }
 
         /** @noinspection SqlDialectInspection */
-        $sql = "UPDATE `myprogramo` SET `last_ip` = :ip, `last_login` = CURRENT_TIMESTAMP WHERE user_name = :user_name limit 1";
+        $sql = "UPDATE myprogramo SET last_ip = :ip, last_login = CURRENT_TIMESTAMP WHERE user_name = :user_name";
         $params = array(':ip' => $ip, ':user_name' => $user_name);
         $transact = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
         $_SESSION['poadmin']['ip'] = $ip;
         $_SESSION['poadmin']['last_login'] = date('l jS \of F Y h:i:s A');
 
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT * FROM `bots` WHERE bot_active = '1' ORDER BY bot_id ASC LIMIT 1";
+        $sql = "SELECT * FROM bots WHERE bot_active = '1' ORDER BY bot_id ASC";
         $row = db_fetch($sql,null, __FILE__, __FUNCTION__, __LINE__);
         $count = count($row);
 

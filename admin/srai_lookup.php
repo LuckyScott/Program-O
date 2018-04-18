@@ -57,7 +57,7 @@ $countSTH->bindValue(':bot_id', $bot_id, PDO::PARAM_INT);
 $countSTH->execute();
 $countRow = $countSTH->fetch();
 $countSTH->closeCursor();
-$row_count = number_format($countRow['COUNT(id)']);
+$row_count = number_format($countRow['count']);
 
 $mainContent = str_replace('[row_count]', $row_count, $mainContent);
 $mainContent = str_replace('[bot_name]', $bot_name, $mainContent);
@@ -80,10 +80,13 @@ function fillLookup()
     try
     {
         /** @noinspection SqlDialectInspection */
-        $dropSQL = '
-    ALTER TABLE srai_lookup DROP INDEX pattern;
-    TRUNCATE TABLE `srai_lookup`;
-    ALTER TABLE `aiml` ADD INDEX `srai_search` (`bot_id`, `pattern`(64));';
+    //     $dropSQL = '
+    // ALTER TABLE srai_lookup DROP INDEX pattern;
+    // TRUNCATE TABLE srai_lookup;
+    // ALTER TABLE aiml ADD INDEX srai_search (bot_id, pattern(64));';
+        $dropSQL = 'DROP INDEX IF EXISTS srai_lookup_pattern;
+        TRUNCATE TABLE srai_lookup;
+        CREATE INDEX srai_search ON aiml USING btree(bot_id, pattern);';
         $dropSTH = $dbConn->prepare($dropSQL);
         $dropSTH->execute();
         $dropSTH->closeCursor();
@@ -161,7 +164,7 @@ function fillLookup()
         }
     }
     /** @noinspection SqlDialectInspection */
-    $insertSQL = "INSERT INTO srai_lookup (id, bot_id, pattern, template_id) VALUES (null, :bot_id, :pattern, :template_id);";
+    $insertSQL = "INSERT INTO srai_lookup (bot_id, pattern, template_id) VALUES (:bot_id, :pattern, :template_id);";
     $insertSTH = $dbConn->prepare($insertSQL);
     $insertCount = 0;
 
@@ -178,7 +181,8 @@ function fillLookup()
 
     // Now put the index back
     /** @noinspection SqlDialectInspection */
-    $indexSQL = 'ALTER TABLE `srai_lookup` ADD INDEX `pattern` (`bot_id`, `pattern`(64)); ALTER TABLE aiml DROP INDEX srai_search;';
+    // $indexSQL = 'ALTER TABLE srai_lookup ADD INDEX pattern (bot_id, pattern(64)); ALTER TABLE aiml DROP INDEX srai_search;';
+    $indexSQL = 'CREATE INDEX srai_lookup_pattern ON srai_lookup USING btree(bot_id, pattern); DROP INDEX IF EXISTS srai_search;';
     $indexSTH = $dbConn->prepare($indexSQL);
     $indexSTH->execute();
     $indexSTH->closeCursor();

@@ -88,10 +88,10 @@ function scPaginate()
     global $dbConn, $group;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT COUNT(*) FROM `spellcheck` WHERE 1";
+    $sql = "SELECT COUNT(*) FROM spellcheck WHERE true";
     $row = db_fetch($sql,null, __FILE__, __FUNCTION__, __LINE__);
 
-    $rowCount = $row['COUNT(*)'];
+    $rowCount = $row['count'];
     $lastPage = intval($rowCount / 50);
     $remainder = ($rowCount / 50) - $lastPage;
 
@@ -148,7 +148,7 @@ function getMisspelledWords()
     $curID = (isset($form_vars['id'])) ? $form_vars['id'] : -1;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `id`,`missspelling` FROM `spellcheck` WHERE 1 ORDER BY abs(`id`) ASC limit $startEntry, 50;";
+    $sql = "SELECT id,missspelling FROM spellcheck WHERE true ORDER BY abs(id) ASC limit 50 offset $startEntry;";
 
     $baseLink = $template->getSection('NavLink');
     $links = '      <div class="userlist">' . "\n";
@@ -212,7 +212,7 @@ function insertSpell()
     }
     else {
         /** @noinspection SqlDialectInspection */
-        $sql = "INSERT INTO `spellcheck` VALUES (NULL,'$missspell','$correction')";
+        $sql = "INSERT INTO spellcheck(missspelling, correction) VALUES ('$missspell','$correction')";
         $params = array(
             ':missspell' => $missspell,
             ':correction' => $correction
@@ -248,7 +248,7 @@ function delSpell($id)
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "DELETE FROM `spellcheck` WHERE `id` = :id LIMIT 1";
+        $sql = "DELETE FROM spellcheck WHERE id = :id";
         $params = array(':id' => $id);
         $affectedRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
 
@@ -276,7 +276,7 @@ function runSpellSearch()
     $search = trim($form_vars['search']);
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `spellcheck` WHERE `missspelling` LIKE :search1 OR `correction` LIKE :search2 LIMIT 50";
+    $sql = "SELECT * FROM spellcheck WHERE missspelling LIKE :search1 OR correction LIKE :search2 LIMIT 50";
     $params = array(
         ':search1' => "%{$search}%",
         ':search2' => "%{$search}%",
@@ -337,7 +337,7 @@ function editSpellForm($id)
     $form   = $template->getSection('EditSpellForm');
 
     /** @noinspection SqlDialectInspection */
-    $sql    = "SELECT * FROM `spellcheck` WHERE `id` = :id LIMIT 1";
+    $sql    = "SELECT * FROM spellcheck WHERE id = :id LIMIT 1";
     $params = array(':id' => $id);
     $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
     $uc_missspelling = _strtoupper($row['missspelling']);
@@ -366,7 +366,7 @@ function updateSpell()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "UPDATE `spellcheck` SET `missspelling` = :missspelling,`correction` = :correction WHERE `id` = :id LIMIT 1";
+        $sql = "UPDATE spellcheck SET missspelling = :missspelling,correction = :correction WHERE id = :id";
         $params = array(
             ':missspelling' => $missspelling,
             ':correction' => $correction,

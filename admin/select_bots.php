@@ -69,7 +69,7 @@ function getBotParentList($current_parent)
     }
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `bots` WHERE bot_active = '1'";
+    $sql = "SELECT * FROM bots WHERE bot_active = '1'";
     $result = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
     $options = '                  <option value="0"[noBot]>No Parent Bot</option>';
 
@@ -139,12 +139,12 @@ function getSelectedBot()
     if ($bot_id != "new")
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT count(*) FROM `aiml` WHERE bot_id = :bot_id;";
+        $sql = "SELECT count(*) FROM aiml WHERE bot_id = :bot_id;";
         $row = db_fetch($sql, array(':bot_id' => $bot_id), __FILE__, __FUNCTION__, __LINE__);
         $aiml_count = ($row['count(*)'] == 0) ? 'no' : number_format($row['count(*)']);
 
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT * FROM `bots` WHERE bot_id = :bot_id;";
+        $sql = "SELECT * FROM bots WHERE bot_id = :bot_id;";
         $row = db_fetch($sql, array(':bot_id' => $bot_id), __FILE__, __FUNCTION__, __LINE__);
         $curBot = $row;
 
@@ -263,9 +263,9 @@ function updateBotSelection()
     $sql = "SELECT * FROM bots WHERE bot_id = :bot_id;";
     $params = array(':bot_id' => $bot_id);
     $result = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
-    $sql = 'UPDATE `bots` [repl] WHERE `bot_id` = :bot_id;';
+    $sql = 'UPDATE bots [repl] WHERE bot_id = :bot_id;';
     $skipVars = array('bot_id', 'action', 'useBranch');
-    $setTemplate = ' set `[key]` = :[key],';
+    $setTemplate = ' set [key] = :[key],';
     $repl = '';
     foreach ($post_vars as $key => $value)
     {
@@ -351,8 +351,8 @@ function addBot()
 
     /** @noinspection PhpUndefinedVariableInspection */
     /** @noinspection SqlDialectInspection */
-    $sql = 'INSERT INTO `bots`(`bot_id`, `bot_name`, `bot_desc`, `bot_active`, `bot_parent_id`, `format`, `save_state`, `conversation_lines`, `remember_up_to`, `debugemail`, `debugshow`, `debugmode`, `default_aiml_pattern`, `error_response`)
-VALUES (NULL,:bot_name,:bot_desc,:bot_active,:bot_parent_id,:format,:save_state,:conversation_lines,:remember_up_to,:debugemail,:debugshow,:debugmode,:aiml_pattern,:error_response);';
+    $sql = 'INSERT INTO bots(bot_name, bot_desc, bot_active, bot_parent_id, format, save_state, conversation_lines, remember_up_to, debugemail, debugshow, debugmode, default_aiml_pattern, error_response)
+VALUES (:bot_name,:bot_desc,:bot_active,:bot_parent_id,:format,:save_state,:conversation_lines,:remember_up_to,:debugemail,:debugshow,:debugmode,:aiml_pattern,:error_response);';
     $params = array(
         ':bot_name'             => $bot_name,
         ':bot_desc'             => $bot_desc,
@@ -400,66 +400,66 @@ function make_bot_predicates($bot_id)
     $msg = '';
 
     $sql = <<<endSQL
-INSERT INTO `botpersonality` VALUES
-    (NULL,  :bot_id, 'age', ''),
-    (NULL,  :bot_id, 'baseballteam', ''),
-    (NULL,  :bot_id, 'birthday', ''),
-    (NULL,  :bot_id, 'birthplace', ''),
-    (NULL,  :bot_id, 'botmaster', ''),
-    (NULL,  :bot_id, 'boyfriend', ''),
-    (NULL,  :bot_id, 'build', ''),
-    (NULL,  :bot_id, 'celebrities', ''),
-    (NULL,  :bot_id, 'celebrity', ''),
-    (NULL,  :bot_id, 'class', ''),
-    (NULL,  :bot_id, 'email', ''),
-    (NULL,  :bot_id, 'emotions', ''),
-    (NULL,  :bot_id, 'ethics', ''),
-    (NULL,  :bot_id, 'etype', ''),
-    (NULL,  :bot_id, 'family', ''),
-    (NULL,  :bot_id, 'favoriteactor', ''),
-    (NULL,  :bot_id, 'favoriteactress', ''),
-    (NULL,  :bot_id, 'favoriteartist', ''),
-    (NULL,  :bot_id, 'favoriteauthor', ''),
-    (NULL,  :bot_id, 'favoriteband', ''),
-    (NULL,  :bot_id, 'favoritebook', ''),
-    (NULL,  :bot_id, 'favoritecolor', ''),
-    (NULL,  :bot_id, 'favoritefood', ''),
-    (NULL,  :bot_id, 'favoritemovie', ''),
-    (NULL,  :bot_id, 'favoritesong', ''),
-    (NULL,  :bot_id, 'favoritesport', ''),
-    (NULL,  :bot_id, 'feelings', ''),
-    (NULL,  :bot_id, 'footballteam', ''),
-    (NULL,  :bot_id, 'forfun', ''),
-    (NULL,  :bot_id, 'friend', ''),
-    (NULL,  :bot_id, 'friends', ''),
-    (NULL,  :bot_id, 'gender', ''),
-    (NULL,  :bot_id, 'genus', ''),
-    (NULL,  :bot_id, 'girlfriend', ''),
-    (NULL,  :bot_id, 'hockeyteam', ''),
-    (NULL,  :bot_id, 'kindmusic', ''),
-    (NULL,  :bot_id, 'kingdom', ''),
-    (NULL,  :bot_id, 'language', ''),
-    (NULL,  :bot_id, 'location', ''),
-    (NULL,  :bot_id, 'looklike', ''),
-    (NULL,  :bot_id, 'master', ''),
-    (NULL,  :bot_id, 'msagent', ''),
-    (NULL,  :bot_id, 'name', :bot_name),
-    (NULL,  :bot_id, 'nationality', ''),
-    (NULL,  :bot_id, 'order', ''),
-    (NULL,  :bot_id, 'orientation', ''),
-    (NULL,  :bot_id, 'party', ''),
-    (NULL,  :bot_id, 'phylum', ''),
-    (NULL,  :bot_id, 'president', ''),
-    (NULL,  :bot_id, 'question', ''),
-    (NULL,  :bot_id, 'religion', ''),
-    (NULL,  :bot_id, 'sign', ''),
-    (NULL,  :bot_id, 'size', ''),
-    (NULL,  :bot_id, 'species', ''),
-    (NULL,  :bot_id, 'talkabout', ''),
-    (NULL,  :bot_id, 'version', ''),
-    (NULL,  :bot_id, 'vocabulary', ''),
-    (NULL,  :bot_id, 'wear', ''),
-    (NULL,  :bot_id, 'website', '');
+INSERT INTO botpersonality (bot_id, name, value) VALUES
+    (:bot_id, 'age', ''),
+    (:bot_id, 'baseballteam', ''),
+    (:bot_id, 'birthday', ''),
+    (:bot_id, 'birthplace', ''),
+    (:bot_id, 'botmaster', ''),
+    (:bot_id, 'boyfriend', ''),
+    (:bot_id, 'build', ''),
+    (:bot_id, 'celebrities', ''),
+    (:bot_id, 'celebrity', ''),
+    (:bot_id, 'class', ''),
+    (:bot_id, 'email', ''),
+    (:bot_id, 'emotions', ''),
+    (:bot_id, 'ethics', ''),
+    (:bot_id, 'etype', ''),
+    (:bot_id, 'family', ''),
+    (:bot_id, 'favoriteactor', ''),
+    (:bot_id, 'favoriteactress', ''),
+    (:bot_id, 'favoriteartist', ''),
+    (:bot_id, 'favoriteauthor', ''),
+    (:bot_id, 'favoriteband', ''),
+    (:bot_id, 'favoritebook', ''),
+    (:bot_id, 'favoritecolor', ''),
+    (:bot_id, 'favoritefood', ''),
+    (:bot_id, 'favoritemovie', ''),
+    (:bot_id, 'favoritesong', ''),
+    (:bot_id, 'favoritesport', ''),
+    (:bot_id, 'feelings', ''),
+    (:bot_id, 'footballteam', ''),
+    (:bot_id, 'forfun', ''),
+    (:bot_id, 'friend', ''),
+    (:bot_id, 'friends', ''),
+    (:bot_id, 'gender', ''),
+    (:bot_id, 'genus', ''),
+    (:bot_id, 'girlfriend', ''),
+    (:bot_id, 'hockeyteam', ''),
+    (:bot_id, 'kindmusic', ''),
+    (:bot_id, 'kingdom', ''),
+    (:bot_id, 'language', ''),
+    (:bot_id, 'location', ''),
+    (:bot_id, 'looklike', ''),
+    (:bot_id, 'master', ''),
+    (:bot_id, 'msagent', ''),
+    (:bot_id, 'name', :bot_name),
+    (:bot_id, 'nationality', ''),
+    (:bot_id, 'order', ''),
+    (:bot_id, 'orientation', ''),
+    (:bot_id, 'party', ''),
+    (:bot_id, 'phylum', ''),
+    (:bot_id, 'president', ''),
+    (:bot_id, 'question', ''),
+    (:bot_id, 'religion', ''),
+    (:bot_id, 'sign', ''),
+    (:bot_id, 'size', ''),
+    (:bot_id, 'species', ''),
+    (:bot_id, 'talkabout', ''),
+    (:bot_id, 'version', ''),
+    (:bot_id, 'vocabulary', ''),
+    (:bot_id, 'wear', ''),
+    (:bot_id, 'website', '');
 endSQL;
     $params = array(':bot_id' => $bot_id, ':bot_name' => $bot_name);
 
@@ -489,7 +489,7 @@ function changeBot()
     if ($post_vars['bot_id'] != "new")
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT * FROM `bots` WHERE bot_id = :botId";
+        $sql = "SELECT * FROM bots WHERE bot_id = :botId";
         $params = array(':botId' => $botId);
         $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
         $count = count($row);
@@ -527,7 +527,7 @@ function getChangeList()
     $bot_id = (isset($_SESSION['poadmin']['bot_id'])) ? $_SESSION['poadmin']['bot_id'] : 0;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `bots` ORDER BY bot_name";
+    $sql = "SELECT * FROM bots ORDER BY bot_name";
     $result = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
     $options = '                <option value="new">Add New Bot</option>' . "\n";
 

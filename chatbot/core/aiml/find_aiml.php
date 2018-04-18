@@ -784,7 +784,7 @@ function get_client_property($convoArr, $name)
     $user_id = $convoArr['conversation']['user_id'];
     $bot_id = $convoArr['conversation']['bot_id'];
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `value` FROM `$dbn`.`client_properties` WHERE `user_id` = :user_id AND `bot_id` = :bot_id AND `name` = '$name' limit 1;";
+    $sql = "SELECT value FROM $dbn.public.client_properties WHERE user_id = :user_id AND bot_id = :bot_id AND name = '$name' limit 1;";
     $params = array(
         ':bot_id' => $bot_id,
         ':user_id' => $user_id,
@@ -835,21 +835,21 @@ function find_userdefined_aiml($convoArr)
     //build sql
     /** @noinspection SqlDialectInspection */
 /*
-SELECT `id`, `bot_id`, `pattern`, `thatpattern`, `topic` FROM `$dbn`.`aiml` WHERE
+SELECT id, bot_id, pattern, thatpattern, topic FROM $dbn.public.aiml WHERE
     [sql_bot_like] AND ([pattern_like][thatpattern_like][topic_like]
-        OR `pattern` LIKE '$default_aiml_pattern'
+        OR pattern LIKE '$default_aiml_pattern'
     )
-    # ORDER BY `id` ASC, `topic` DESC, `pattern` ASC, `thatpattern` ASC;
+    # ORDER BY id ASC, topic DESC, pattern ASC, thatpattern ASC;
 */
     $sql = <<<endSQL
-SELECT `id`, `bot_id`, `pattern`, `thatpattern`, `template` FROM `$dbn`.`aiml_userdefined` WHERE
-    `bot_id` = :bot_id AND
-    `user_id` = :user_id
+SELECT id, bot_id, pattern, thatpattern, template FROM $dbn.public.aiml_userdefined WHERE
+    bot_id = :bot_id AND
+    user_id = :user_id
     AND ([pattern_like][thatpattern_like])
-   ORDER BY `id` ASC, `pattern` ASC, `thatpattern` ASC;
+   ORDER BY id ASC, pattern ASC, thatpattern ASC;
 endSQL;
 
-    $rplTemplate = "'[search]' LIKE (REPLACE(REPLACE(`[field]`, '*', '%'), '_', '%'))";
+    $rplTemplate = "'[search]' LIKE (REPLACE(REPLACE([field], '*', '%'), '_', '%'))";
 
     // Build the pattern search
     $pattern_like = "\n        " . str_replace('[search]', $lookingfor, $rplTemplate);
@@ -1009,7 +1009,7 @@ function find_aiml_matches($convoArr)
         $sql_bot_like = "bot_id = :bot_id";
         $params[':bot_id'] = $bot_id;
     }
-    $rplTemplate = "'[search]' LIKE (REPLACE(REPLACE(`[field]`, '*', '%'), '_', '%'))";
+    $rplTemplate = "'[search]' LIKE (REPLACE(REPLACE([field], '*', '%'), '_', '%'))";
 
     // Build the pattern search
     $pattern_like = "\n        " . str_replace('[search]', $lookingfor, $rplTemplate);
@@ -1037,11 +1037,11 @@ function find_aiml_matches($convoArr)
     // The SQL template - There will ALWAYS be a pattern search, but not necessarily a thatpattern or topic.
     // There will also ALWAYS be a search for the default response category
     $sql = <<<endSQL
-SELECT `id`, `bot_id`, `pattern`, `thatpattern`, `topic`, `filename`, `template` FROM `$dbn`.`aiml` WHERE
+SELECT id, bot_id, pattern, thatpattern, topic, filename, template FROM $dbn.public.aiml WHERE
     [sql_bot_like] AND ([pattern_like][thatpattern_like][topic_like]
-        OR `pattern` LIKE '$default_aiml_pattern'
+        OR pattern LIKE '$default_aiml_pattern'
     )
-    # ORDER BY `id` ASC, `topic` DESC, `pattern` ASC, `thatpattern` ASC;
+    ORDER BY id ASC, topic DESC, pattern ASC, thatpattern ASC;
 endSQL;
 
 
@@ -1111,7 +1111,7 @@ function get_topic($convoArr)
     $user_id = $convoArr['conversation']['user_id'];
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `value` FROM `client_properties` WHERE `user_id` = :user_id AND `bot_id` = :bot_id and `name` = 'topic';";
+    $sql = "SELECT value FROM client_properties WHERE user_id = :user_id AND bot_id = :bot_id and name = 'topic';";
     $params = array(
         ':bot_id' => $bot_id,
         ':user_id' => $user_id,

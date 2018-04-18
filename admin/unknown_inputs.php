@@ -64,7 +64,7 @@ function getUserNames()
     $nameList = array();
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `id`, `user_name` FROM `users` WHERE 1 order by `id`;";
+    $sql = "SELECT id, user_name FROM users WHERE true order by id;";
     $result = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
     foreach ($result as $row) {
         $nameList[$row['id']] = $row['user_name'];
@@ -90,7 +90,7 @@ function getUserList($bot_id, $showing)
     $linkTag = $template->getSection('NavLink');
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `unknown_inputs`  WHERE bot_id = :bot_id AND DATE(`timestamp`) >= ([repl_date]) GROUP BY `user_id`, `convo_id` ORDER BY ABS(`user_id`) ASC";
+    $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM unknown_inputs  WHERE bot_id = :bot_id AND DATE(timestamp) >= ([repl_date]) GROUP BY user_id, convo_id ORDER BY ABS(user_id) ASC";
     $showarray = array("last 20", "previous week", "previous 2 weeks", "previous month", "last 6 months", "this year", "previous year", "all years");
 
     switch ($showing)
@@ -120,18 +120,18 @@ function getUserList($bot_id, $showing)
             break;
         case "all time" :
             /** @noinspection SqlDialectInspection */
-            $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `unknown_inputs`  WHERE  bot_id = '$bot_id' GROUP BY `user_id` ORDER BY ABS(`user_id`) ASC;";
+            $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM unknown_inputs  WHERE  bot_id = '$bot_id' GROUP BY user_id ORDER BY ABS(user_id) ASC;";
             //$repl_date = time();
             $repl_date = false;
             break;
         case 'last 20':
-            $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `unknown_inputs`  WHERE  bot_id = '$bot_id' GROUP BY `user_id` ORDER BY ABS(`user_id`) ASC limit 20;";
+            $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM unknown_inputs  WHERE  bot_id = '$bot_id' GROUP BY user_id ORDER BY ABS(user_id) ASC limit 20;";
             //$repl_date = time();
             $repl_date = false;
             break;
         default :
             /** @noinspection SqlDialectInspection */
-            $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `unknown_inputs`  WHERE  bot_id = '$bot_id' GROUP BY `user_id` ORDER BY ABS(`user_id`) ASC;";
+            $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM unknown_inputs  WHERE  bot_id = '$bot_id' GROUP BY user_id ORDER BY ABS(user_id) ASC;";
             //$repl_date = time();
             $repl_date = false;
     }
@@ -159,7 +159,7 @@ function getUserList($bot_id, $showing)
             $linkClass = ($user_id == $curUserid) ? 'selected' : 'noClass';
             $userName = (!empty($nameList[$user_id])) ? $nameList[$user_id] : 'Unknown';
 
-            $TOT = $row['TOT'];
+            $TOT = $row['tot'];
 
             $tmpLink = str_replace('[linkClass]', " class=\"$linkClass\"", $linkTag);
             $tmpLink = str_replace('[linkOnclick]', '', $tmpLink);
@@ -236,7 +236,7 @@ function get_unknown_inputs($id)
 
     //get undefined defaults from the db
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT *  FROM `unknown_inputs` WHERE `bot_id` = :bot_id AND `user_id` = :user_id ORDER BY `id` ASC";
+    $sql = "SELECT *  FROM unknown_inputs WHERE bot_id = :bot_id AND user_id = :user_id ORDER BY id ASC";
     $list = "<hr><br/><h4>Unknown inputs for user: $user_name (ID #$id)</h4>";
     $list .= "<div class=\"convolist\">";
 

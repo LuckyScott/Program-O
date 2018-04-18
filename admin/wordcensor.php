@@ -91,9 +91,9 @@ function wcPaginate()
     global $dbConn, $group;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT COUNT(*) FROM `wordcensor` WHERE 1";
+    $sql = "SELECT COUNT(*) FROM wordcensor WHERE true";
     $row = db_fetch($sql,null, __FILE__, __FUNCTION__, __LINE__);
-    $rowCount = isset($row['COUNT(*)']) ? $row['COUNT(*)'] : 0;
+    $rowCount = isset($row['count']) ? $row['count'] : 0;
     $lastPage = intval($rowCount / 50);
     $remainder = ($rowCount / 50) - $lastPage;
 
@@ -145,7 +145,7 @@ function getWordCensorWords()
     $curID = (isset ($form_vars['id'])) ? $form_vars['id'] : -1;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `censor_id`,`word_to_censor` FROM `wordcensor` WHERE 1 ORDER BY abs(`censor_id`) ASC limit $startEntry, 50;";
+    $sql = "SELECT censor_id,word_to_censor FROM wordcensor WHERE true ORDER BY abs(censor_id) ASC limit 50 offset $startEntry;";
     $baseLink = $template->getSection('NavLink');
     $links = '      <div class="userlist">' . "\n";
     $count = 0;
@@ -211,7 +211,7 @@ function insertWordCensor()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = 'INSERT INTO `wordcensor` (`censor_id`, `word_to_censor`, `replace_with`, `bot_exclude`) VALUES (NULL, :word_to_censor, :replace_with, "")';
+        $sql = 'INSERT INTO wordcensor ( word_to_censor, replace_with, bot_exclude) VALUES (:word_to_censor, :replace_with, "")';
         $params = array(
             ':word_to_censor' => $word_to_censor,
             ':replace_with' => $replace_with,
@@ -246,7 +246,7 @@ function delWordCensor($id)
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = 'DELETE FROM `wordcensor` WHERE `censor_id` = :id LIMIT 1;';
+        $sql = 'DELETE FROM wordcensor WHERE censor_id = :id;';
         $params = array(
             ':id' => $id
         );
@@ -273,7 +273,7 @@ function runWordCensorSearch()
 
     $search = trim($form_vars['search']);
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `wordcensor` WHERE `word_to_censor` LIKE :search1 OR `replace_with` LIKE :search2 LIMIT 50";
+    $sql = "SELECT * FROM wordcensor WHERE word_to_censor LIKE :search1 OR replace_with LIKE :search2 LIMIT 50";
     $params = array(
         ':search1' => "%{$search}%",
         ':search2' => "%{$search}%",
@@ -342,7 +342,7 @@ function editWordCensorForm($id)
     $form = $template->getSection('EditWordCensorForm');
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `wordcensor` WHERE `censor_id` = :id LIMIT 1";
+    $sql = "SELECT * FROM wordcensor WHERE censor_id = :id LIMIT 1";
     $params = array(':id' => $id);
     $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
     $uc_word_to_censor = _strtoupper($row['word_to_censor']);
@@ -371,7 +371,7 @@ function updateWordCensor()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = 'UPDATE `wordcensor` SET `word_to_censor` = :word_to_censor,`replace_with`= :replace_with WHERE `censor_id`= :id LIMIT 1';
+        $sql = 'UPDATE wordcensor SET word_to_censor = :word_to_censor,replace_with= :replace_with WHERE censor_id= :id';
         $params = array(
             ':word_to_censor' => $word_to_censor,
             ':replace_with' => $replace_with,

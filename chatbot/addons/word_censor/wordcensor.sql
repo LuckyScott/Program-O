@@ -22,22 +22,22 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wordcensor`
+-- Table structure for table wordcensor
 --
 
-CREATE TABLE IF NOT EXISTS `wordcensor` (
-  `censor_id` int(11) NOT NULL AUTO_INCREMENT,
-  `word_to_censor` varchar(50) NOT NULL,
-  `replace_with` varchar(50) NOT NULL DEFAULT '****',
-  `bot_exclude` varchar(255) NOT NULL,
-  PRIMARY KEY (`censor_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
+CREATE TABLE IF NOT EXISTS wordcensor (
+  censor_id serial NOT NULL,
+  word_to_censor varchar(50) NOT NULL,
+  replace_with varchar(50) NOT NULL DEFAULT '****',
+  bot_exclude varchar(255) NOT NULL,
+  PRIMARY KEY (censor_id)
+);
 
 --
--- Dumping data for table `wordcensor`
+-- Dumping data for table wordcensor
 --
 
-INSERT INTO `wordcensor` (`censor_id`, `word_to_censor`, `replace_with`, `bot_exclude`) VALUES
+INSERT INTO wordcensor (censor_id, word_to_censor, replace_with, bot_exclude) VALUES
 (1, 'fucking', 'f^@%^^g', ''),
 (2, 'fucker', 'f%%!^r', ''),
 (3, 'fucked', 'f!^#&d', ''),
@@ -68,3 +68,5 @@ INSERT INTO `wordcensor` (`censor_id`, `word_to_censor`, `replace_with`, `bot_ex
 (28, 'vagina', 'v!@*^a', ''),
 (29, 'viagra', 'v$$!&a', ''),
 (30, 'cialis', 'c*&$!s', '');
+
+SELECT pg_catalog.setval('wordcensor_censor_id_seq', 30, true);

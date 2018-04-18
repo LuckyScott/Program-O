@@ -348,7 +348,7 @@ function Save()
             try {
                 /** @noinspection SqlDialectInspection */
                 /** @noinspection SqlNoDataSourceInspection */
-                $sql = "DROP TABLE IF EXISTS `srai_lookup`; CREATE TABLE IF NOT EXISTS `srai_lookup` (`id` int(11) NOT NULL AUTO_INCREMENT, `bot_id` int(11) NOT NULL, `pattern` text NOT NULL, `template_id` int(11) NOT NULL, PRIMARY KEY (`id`), KEY `pattern` (`pattern`(64)) COMMENT 'Search against this for performance boost') ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Contains previously stored SRAI calls' AUTO_INCREMENT=1;";
+                $sql = "DROP TABLE IF EXISTS srai_lookup; CREATE TABLE IF NOT EXISTS srai_lookup (id serial NOT NULL, bot_id integer NOT NULL, pattern text NOT NULL, template_id integer NOT NULL, PRIMARY KEY (id)); CREATE INDEX srai_lookup_pattern ON srai_lookup USING btree (bot_id, pattern);";
                 $affectedRows = db_write($sql,null, false, __FILE__, __FUNCTION__, __LINE__, false);
             }
             catch(Exception $e) {
@@ -359,7 +359,7 @@ function Save()
 
     /** @noinspection SqlDialectInspection */
     /** @noinspection SqlNoDataSourceInspection */
-    $sql = 'SELECT `bot_id` FROM `bots`;';
+    $sql = 'SELECT bot_id FROM bots;';
     $result = db_fetchAll($sql);
 
     $bot_id               = 1;
@@ -396,29 +396,29 @@ function Save()
     {
         /** @noinspection SqlDialectInspection */
         /** @noinspection SqlNoDataSourceInspection */
-        $sql = 'insert ignore into `bots` (`bot_id`, `bot_name`, `bot_desc`, `bot_active`, `bot_parent_id`, `format`, `save_state`, `conversation_lines`, `remember_up_to`, `debugemail`, `debugshow`, `debugmode`, `error_response`, `default_aiml_pattern`)
-    values ( :bot_id, :bot_name, :bot_desc, :bot_active, :bot_parent_id, :format, :save_state, :conversation_lines, :remember_up_to, :debugemail, :debugshow, :debugmode, :error_response, :default_aiml_pattern);';
+        $sql = 'insert into bots (bot_id, bot_name, bot_desc, bot_active, bot_parent_id, format, save_state, conversation_lines, remember_up_to, debugemail, debugshow, debugmode, error_response, default_aiml_pattern)
+    values ( :bot_id, :bot_name, :bot_desc, :bot_active, :bot_parent_id, :format, :save_state, :conversation_lines, :remember_up_to, :debugemail, :debugshow, :debugmode, :error_response, :default_aiml_pattern) ON CONFLICT DO NOTHING;';
 
     }
     else
     {
         /** @noinspection SqlDialectInspection */
         /** @noinspection SqlNoDataSourceInspection */
-        $sql = 'update `bots` set
-    `bot_name`             = :bot_name,
-    `bot_desc`             = :bot_desc,
-    `bot_active`           = :bot_active,
-    `bot_parent_id`        = :bot_parent_id,
-    `format`               = :format,
-    `save_state`           = :save_state,
-    `conversation_lines`   = :conversation_lines,
-    `remember_up_to`       = :remember_up_to,
-    `debugemail`           = :debugemail,
-    `debugshow`            = :debugshow,
-    `debugmode`            = :debugmode,
-    `error_response`       = :error_response,
-    `default_aiml_pattern` = :default_aiml_pattern
-where `bot_id` = :bot_id;
+        $sql = 'update bots set
+    bot_name             = :bot_name,
+    bot_desc             = :bot_desc,
+    bot_active           = :bot_active,
+    bot_parent_id        = :bot_parent_id,
+    format               = :format,
+    save_state           = :save_state,
+    conversation_lines   = :conversation_lines,
+    remember_up_to       = :remember_up_to,
+    debugemail           = :debugemail,
+    debugshow            = :debugshow,
+    debugmode            = :debugmode,
+    error_response       = :error_response,
+    default_aiml_pattern = :default_aiml_pattern
+where bot_id = :bot_id;
     ';
     }
 
@@ -438,14 +438,14 @@ where `bot_id` = :bot_id;
 
     /** @noinspection SqlDialectInspection */
     /** @noinspection SqlNoDataSourceInspection */
-    $sql = "SELECT id FROM `myprogramo` WHERE `user_name` = '$adm_dbu' AND `password` = '$encrypted_adm_dbp';";
+    $sql = "SELECT id FROM myprogramo WHERE user_name = '$adm_dbu' AND password = '$encrypted_adm_dbp';";
     $result = db_fetchAll($sql);
 
     if (count($result) == 0)
     {
         /** @noinspection SqlDialectInspection */
         /** @noinspection SqlNoDataSourceInspection */
-        $sql = "INSERT ignore INTO `myprogramo` (`id`, `user_name`, `password`, `last_ip`) VALUES(null, :adm_dbu, :encrypted_adm_dbp, :cur_ip);";
+        $sql = "INSERT INTO myprogramo (user_name, password, last_ip) VALUES(:adm_dbu, :encrypted_adm_dbp, :cur_ip) ON CONFLICT DO NOTHING;";
         $params = array(
             ':adm_dbu' => $adm_dbu,
             ':encrypted_adm_dbp' => $encrypted_adm_dbp,
@@ -556,7 +556,8 @@ function db_open()
 
     try
     {
-        $dbConn = new PDO("mysql:host=$dbh;port=$dbPort;dbname=$dbn;charset=utf8", $dbu, $dbp);
+        # $dbConn = new PDO("mysql:host=$dbh;port=$dbPort;dbname=$dbn;charset=utf8", $dbu, $dbp);
+        $dbConn = new PDO("pgsql:host=$dbh;port=$dbPort;dbname=$dbn", $dbu, $dbp);
         $dbConn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $dbConn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $dbConn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);

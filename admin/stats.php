@@ -78,9 +78,9 @@ function getStats($interval)
 
     //get undefined defaults from the db
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT COUNT(DISTINCT(`user_id`)) AS TOT FROM `conversation_log` WHERE bot_id = :bot_id $sqladd";
+    $sql = "SELECT COUNT(DISTINCT(user_id)) AS TOT FROM conversation_log WHERE bot_id = :bot_id $sqladd";
     $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
-    $res = $row['TOT'];
+    $res = $row['tot'];
 
     return $res;
 }
@@ -97,20 +97,20 @@ function getChatLines($i, $j)
     global $bot_id, $dbConn;
 
     $sql = <<<endSQL
-SELECT AVG(`chatlines`) AS TOT
-				FROM `users`
-				INNER JOIN `conversation_log` ON `users`.`id` = `conversation_log`.`user_id`
-				WHERE `conversation_log`.`bot_id` = :bot_id AND [endCondition];
+SELECT AVG(chatlines) AS TOT
+				FROM users
+				INNER JOIN conversation_log ON users.id = conversation_log.user_id
+				WHERE conversation_log.bot_id = :bot_id AND [endCondition];
 endSQL;
 
     $params = array(':bot_id' => $bot_id);
 
     if ($i == "average")
     {
-        $endCondition = '`chatlines` != 0;';
+        $endCondition = 'chatlines != 0;';
     }
     else {
-        $endCondition = "(`chatlines` >= :i AND `chatlines` <= :j)";
+        $endCondition = "(chatlines >= :i AND chatlines <= :j)";
         $params[':i'] = $i;
         $params[':j'] = $j;
     }
@@ -118,7 +118,7 @@ endSQL;
     $sql = str_replace('[endCondition]', $endCondition, $sql);
     //get undefined defaults from the db
     $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
-    $res = $row['TOT'];
+    $res = $row['tot'];
 
     return $res;
 }

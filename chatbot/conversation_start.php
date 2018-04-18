@@ -39,7 +39,7 @@ $dbConn = db_open();
 
 $versionCheckSQL = 'select version();';
 $result = db_fetch($versionCheckSQL);
-$mySQL_version = $result['version()'];
+$mySQL_version = $result['version'];
 $pgoVersion = VERSION;
 $phpVersion = phpversion();
 $serverSoftware = $_SERVER['SERVER_SOFTWARE'];
@@ -136,7 +136,7 @@ if (!empty($say)) {
         $user_id = (isset($convoArr['conversation']['user_id'])) ? $convoArr['conversation']['user_id'] : -1;
 
         /** @noinspection SqlDialectInspection */
-        $sql = "DELETE FROM `$dbn`.`client_properties` WHERE `user_id` = $user_id;";
+        $sql = "DELETE FROM $dbn.public.client_properties WHERE user_id = $user_id;";
 
         $sth = $dbConn->prepare($sql);
         $sth->execute();
@@ -162,7 +162,7 @@ if (!empty($say)) {
 
         // Update the users table, and clear out any unused client properties as needed
         /** @noinspection SqlDialectInspection */
-        $sql = "UPDATE `$dbn`.`users` SET `session_id` = '$new_convo_id' WHERE `session_id` = '$old_convo_id';";
+        $sql = "UPDATE $dbn.public.users SET session_id = '$new_convo_id' WHERE session_id = '$old_convo_id';";
         runDebug(__FILE__, __FUNCTION__, __LINE__, "Update user - SQL:\n$sql", 3);
 
         $sth = $dbConn->prepare($sql);
@@ -171,7 +171,7 @@ if (!empty($say)) {
         $confirm = $sth->rowCount();
         // Get user id, so that we can clear the client properties
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT `id` FROM `$dbn`.`users` WHERE `session_id` = :new_convo_id limit 1;";
+        $sql = "SELECT id FROM $dbn.public.users WHERE session_id = :new_convo_id limit 1;";
         $params = array(':new_convo_id' => $new_convo_id);
         $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
 
@@ -182,7 +182,7 @@ if (!empty($say)) {
 
             runDebug(__FILE__, __FUNCTION__, __LINE__, "User ID = $user_id.", 4);
             /** @noinspection SqlDialectInspection */
-            $sql = "DELETE FROM `$dbn`.`client_properties` WHERE `user_id` = $user_id;";
+            $sql = "DELETE FROM $dbn.public.client_properties WHERE user_id = $user_id;";
             runDebug(__FILE__, __FUNCTION__, __LINE__, "Clear client properties from the DB - SQL:\n$sql", 4);
         }
 

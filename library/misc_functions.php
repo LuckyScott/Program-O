@@ -221,7 +221,7 @@ function addUnknownInput($convoArr, $input, $bot_id, $user_id)
     }
 
     /** @noinspection SqlDialectInspection */
-    $sql = "INSERT INTO `$dbn`.`unknown_inputs` (`id`, `bot_id`, `input`, `user_id`, `timestamp`) VALUES(null, :bot_id, :input, :user_id, CURRENT_TIMESTAMP);";
+    $sql = "INSERT INTO $dbn.public.unknown_inputs (bot_id, input, user_id, timestamp) VALUES(:bot_id, :input, :user_id, CURRENT_TIMESTAMP);";
 
     $params = array(
         ':bot_id' => $bot_id,

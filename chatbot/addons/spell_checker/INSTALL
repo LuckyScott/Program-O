@@ -14,15 +14,15 @@ STEP 1:
 ----------------------------------------------------------------------------------------------
 - run the following sql on your bot database
 ----------------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `spellcheck` (
-  `id` int(11) NOT NULL auto_increment,
-  `missspelling` varchar(100) NOT NULL,
-  `correction` varchar(100) NOT NULL,
-  `bot_exclude` varchar(255) NOT NULL,
-  PRIMARY KEY  (`id`)
+CREATE TABLE IF NOT EXISTS spellcheck (
+  id int(11) NOT NULL auto_increment,
+  missspelling varchar(100) NOT NULL,
+  correction varchar(100) NOT NULL,
+  bot_exclude varchar(255) NOT NULL,
+  PRIMARY KEY  (id)
 );
 
-INSERT INTO `spellcheck` (`id`, `missspelling`, `correction`, `bot_exclude`) VALUES
+INSERT INTO spellcheck (id, missspelling, correction, bot_exclude) VALUES
 (1, 'wot', 'what', ''),
 (2, 'wots', 'what is', '');
 

@@ -109,7 +109,7 @@ function insertAIML()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = 'INSERT INTO `aiml` (`id`,`bot_id`, `pattern`,`thatpattern`,`template`,`topic`,`filename`) VALUES (NULL, :bot_id, :pattern, :thatpattern, :aimltemplate, :topic, :file)';
+        $sql = 'INSERT INTO aiml (bot_id, pattern,thatpattern,template,topic,filename) VALUES (:bot_id, :pattern, :thatpattern, :aimltemplate, :topic, :file)';
         $params = array(
             ':bot_id' => $bot_id,
             ':pattern' => $pattern,

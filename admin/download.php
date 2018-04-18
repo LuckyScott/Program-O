@@ -263,7 +263,7 @@ function getSQLByFileName($filename)
         $template = str_replace("\n", '', $template);
 
         //$newLine = str_replace('[id]', $row['id'], $categoryTemplate);
-        $newLine = str_replace('[id]', 'null', $categoryTemplate);
+        // $newLine = str_replace('[id]', 'null', $categoryTemplate);
         $newLine = str_replace('[bot_id]', $row['bot_id'], $newLine);
         $newLine = str_replace('[aiml]', $aiml, $newLine);
         $newLine = str_replace('[pattern]', $row['pattern'], $newLine);
@@ -291,7 +291,7 @@ function getCheckboxes()
     global $bot_id, $bot_name, $msg;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT DISTINCT filename FROM `aiml` WHERE `bot_id` = :bot_id ORDER BY `filename`;";
+    $sql = "SELECT DISTINCT filename FROM aiml WHERE bot_id = :bot_id ORDER BY filename;";
     $params = array(':bot_id' => $bot_id);
     $result = db_fetchAll($sql, $params, __FILE__, __FUNCTION__, __LINE__);
 

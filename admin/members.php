@@ -109,7 +109,7 @@ function save($action)
         case 'Add':
             $ip = $_SERVER['REMOTE_ADDR'];
             /** @noinspection SqlDialectInspection */
-            $sql = "INSERT INTO myprogramo (id, user_name, password, last_ip, last_login) VALUES (null, :user_name, :password,:ip, CURRENT_TIMESTAMP);";
+            $sql = "INSERT INTO myprogramo (user_name, password, last_ip, last_login) VALUES (:user_name, :password,:ip, CURRENT_TIMESTAMP);";
             $params = array(
                 ':user_name' => $user_name,
                 ':password' => $password,
@@ -120,7 +120,7 @@ function save($action)
         case 'Delete':
             $action = 'Add';
             /** @noinspection SqlDialectInspection */
-            $sql = "DELETE FROM `$dbn`.`myprogramo` WHERE `myprogramo`.`id` = :id LIMIT 1";
+            $sql = "DELETE FROM $dbn.public.myprogramo WHERE myprogramo.id = :id";
             $params = array(':id' => $id);
             $out = "Account for $user_name successfully deleted!";
             break;

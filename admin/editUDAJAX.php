@@ -68,7 +68,7 @@ function delAIML($id)
     if ($id != "")
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "DELETE FROM `aiml_userdefined` WHERE `id` = :id LIMIT 1";
+        $sql = "DELETE FROM aiml_userdefined WHERE id = :id";
         $params = array(':id' => $id);
         $affectedRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
 
@@ -118,7 +118,7 @@ function runSearch()
 
             //if ($tmpSearch == '_') $tmpSearch = '\\_';
             $tmpName = $column['data'];
-            $addWhere = "`$tmpName` like '%$tmpSearch%'";
+            $addWhere = "$tmpName like '%$tmpSearch%'";
             $where[] = $addWhere;
         }
     }
@@ -145,13 +145,13 @@ function runSearch()
     }
 
     /** @noinspection SqlDialectInspection */
-    $countSQL = "SELECT count(id) FROM `aiml_userdefined` WHERE `bot_id` = ? AND ($searchTerms);";
+    $countSQL = "SELECT count(id) FROM aiml_userdefined WHERE bot_id = ? AND ($searchTerms);";
     $count = db_fetch($countSQL, $searchParams, __FILE__, __FUNCTION__, __LINE__);
-    $total = $count['count(id)'];
+    $total = $count['count'];
 
     /** @noinspection SqlDialectInspection */
     /** @noinspection PhpUndefinedVariableInspection */
-    $sql = "SELECT id, user_id, pattern, thatpattern, template FROM `aiml_userdefined` " . "WHERE `bot_id` = ? AND ($searchTerms) order by $orderBy limit $start, $length;"; //
+    $sql = "SELECT id, user_id, pattern, thatpattern, template FROM aiml_userdefined " . "WHERE bot_id = ? AND ($searchTerms) order by $orderBy limit $length offset $start;"; //
     $debugSQL = db_parseSQL($sql, $searchParams);
     //file_put_contents(_LOG_PATH_ . 'editUDAJAX.sql.txt', $debugSQL);
     $result = db_fetchAll($sql, $searchParams, __FILE__, __FUNCTION__, __LINE__);
@@ -204,7 +204,7 @@ function updateAIML()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "UPDATE `aiml_userdefined` SET `pattern`=?,`thatpattern`=?,`template`=?,`user_id`=? WHERE `id`=? LIMIT 1";
+        $sql = "UPDATE aiml_userdefined SET pattern=?,thatpattern=?,template=?,user_id=? WHERE id=?";
         $sth = $dbConn->prepare($sql);
 
         try
@@ -264,7 +264,7 @@ function insertAIML()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sth = $dbConn->prepare("INSERT INTO `aiml_userdefined` (`id`,`bot_id`,`user_id`, `pattern`,`thatpattern`,`template`) " . "VALUES (NULL, ?, ?, ?, ?, ?)");
+        $sth = $dbConn->prepare("INSERT INTO aiml_userdefined (bot_id,user_id, pattern,thatpattern,template) " . "VALUES (?, ?, ?, ?, ?)");
 
         try {
             $sth->execute(array($bot_id, $user_id, $pattern, $thatpattern, $aimltemplate));

@@ -85,7 +85,7 @@ function getUserNames()
     $nameList = array();
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `id`, `user_name` FROM `users` WHERE 1 order by `id`;";
+    $sql = "SELECT id, user_name FROM users WHERE true order by id;";
     $result = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
     foreach ($result as $row) {
         $nameList[$row['id']] = $row['user_name'];
@@ -111,7 +111,7 @@ function getUserList($bot_id, $showing)
     $linkTag = $template->getSection('NavLink');
     $ts = '';
 
-    $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `conversation_log`  WHERE bot_id = :bot_id AND DATE(`timestamp`) >= [ts] GROUP BY `user_id`, `convo_id` ORDER BY ABS(`user_id`) ASC;";
+    $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM conversation_log  WHERE bot_id = :bot_id AND DATE(timestamp) >= [ts] GROUP BY user_id, convo_id ORDER BY ABS(user_id) ASC;";
 
     switch ($showing)
     {
@@ -137,13 +137,13 @@ function getUserList($bot_id, $showing)
             $ts = '0';
             break;
         case 'last 20':
-            $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `conversation_log`  WHERE  bot_id = '$bot_id' GROUP BY `user_id` ORDER BY ABS(`user_id`) ASC limit 20;";
+            $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM conversation_log  WHERE  bot_id = '$bot_id' GROUP BY user_id ORDER BY ABS(user_id) ASC limit 20;";
             //$repl_date = time();
             $repl_date = false;
             break;
         default :
             /** @noinspection SqlDialectInspection */
-            $sql = "SELECT DISTINCT(`user_id`),COUNT(`user_id`) AS TOT FROM `conversation_log`  WHERE  bot_id = :bot_id GROUP BY `user_id` ORDER BY ABS(`user_id`) ASC;";
+            $sql = "SELECT DISTINCT(user_id),COUNT(user_id) AS TOT FROM conversation_log  WHERE  bot_id = :bot_id GROUP BY user_id ORDER BY ABS(user_id) ASC;";
     }
 
     $list = '<div class="userlist"><ul>';
@@ -169,7 +169,7 @@ function getUserList($bot_id, $showing)
             $linkClass = ($user_id == $curUserid) ? 'selected' : 'noClass';
             $userName = (!empty($nameList[$user_id])) ? $nameList[$user_id] : 'Unknown';
 
-            $TOT = $row['TOT'];
+            $TOT = $row['tot'];
 
             $tmpLink = str_replace('[linkClass]', " class=\"$linkClass\"", $linkTag);
             $tmpLink = str_replace('[linkOnclick]', '', $tmpLink);
@@ -241,7 +241,7 @@ function getuserConvo($id, $showing)
     $ts = '';
     $ats = '';
     /** @noinspection SqlDialectInspection */
-    $sql = 'SELECT *  FROM `conversation_log` WHERE `bot_id` = :bot_id AND `user_id` = :user_id  AND DATE(`timestamp`) >= [ts] ORDER BY `id` ASC;';
+    $sql = 'SELECT *  FROM conversation_log WHERE bot_id = :bot_id AND user_id = :user_id  AND DATE(timestamp) >= [ts] ORDER BY id ASC;';
 
     switch ($showing)
     {
@@ -271,12 +271,12 @@ function getuserConvo($id, $showing)
             break;
         case 'last 20':
             /** @noinspection SqlDialectInspection */
-            $sql = 'SELECT *  FROM `conversation_log` WHERE `bot_id` = :bot_id AND `user_id` = :user_id ORDER BY `id` ASC limit 20;';
+            $sql = 'SELECT *  FROM conversation_log WHERE bot_id = :bot_id AND user_id = :user_id ORDER BY id ASC limit 20;';
             $title = "Last 20 Conversation entries for user: $user_name (ID #{$id})";
             $ats = '0 limit 20';
             break;
         case 'all time' :
-            $sql = 'SELECT *  FROM `conversation_log` WHERE `bot_id` = :bot_id AND `user_id` = :user_id ORDER BY `id` ASC;';
+            $sql = 'SELECT *  FROM conversation_log WHERE bot_id = :bot_id AND user_id = :user_id ORDER BY id ASC;';
             $title = "All conversations for user: $user_name (ID #{$id})";
             $ats = 'foo';
             break;
@@ -348,9 +348,9 @@ function clearLogs()
     extract($get_vars);
     $storedRows = $_SESSION['stored_rows'];
 
-    $idRegEx =implode(' OR `id` = ', $storedRows[$sr]);
+    $idRegEx =implode(' OR id = ', $storedRows[$sr]);
     list($bot_id, $user_id, $timestamp) = explode('_', $sr);
-    $sql = "DELETE from `conversation_log` where id = $idRegEx;";
+    $sql = "DELETE from conversation_log where id = $idRegEx;";
     //save_file(_LOG_PATH_ . 'clearLogs.sql.txt', $sql);
     $numRows = db_write($sql);
     If ($numRows > 0)

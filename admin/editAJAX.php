@@ -69,7 +69,7 @@ function delAIML($id)
     if ($id != "")
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "DELETE FROM `aiml` WHERE `id` = :id LIMIT 1";
+        $sql = "DELETE FROM aiml WHERE id = :id";
         $params = array(':id' => $id);
         $affectedRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
 
@@ -118,7 +118,7 @@ function runSearch()
             $tmpSearch = str_replace('%', '\\$', $tmpSearch);
 
             $tmpName = $column['data'];
-            $addWhere = "`$tmpName` like '%$tmpSearch%'";
+            $addWhere = "$tmpName like '%$tmpSearch%'";
             $where[] = $addWhere;
         }
     }
@@ -145,13 +145,13 @@ function runSearch()
     }
 
     /** @noinspection SqlDialectInspection */
-    $countSQL = "SELECT count(id) FROM `aiml` WHERE `bot_id` = ? AND ($searchTerms);";
+    $countSQL = "SELECT count(id) FROM aiml WHERE bot_id = ? AND ($searchTerms);";
     $count = db_fetch($countSQL, $searchParams, __FILE__, __FUNCTION__, __LINE__);
-    $total = $count['count(id)'];
+    $total = $count['count'];
 
     /** @noinspection SqlDialectInspection */
     /** @noinspection PhpUndefinedVariableInspection */
-    $sql = "SELECT id, pattern, thatpattern, template, topic, filename FROM `aiml` " . "WHERE `bot_id` = $bot_id AND ($searchTerms) order by $orderBy limit $start, $length;";
+    $sql = "SELECT id, pattern, thatpattern, template, topic, filename FROM aiml " . "WHERE bot_id = $bot_id AND ($searchTerms) order by $orderBy limit $length offset $start;";
     $result = db_fetchAll($sql, $searchParams, __FILE__, __FUNCTION__, __LINE__);
 
     /** @noinspection PhpUndefinedVariableInspection */
@@ -203,13 +203,13 @@ function updateAIML()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = 'UPDATE `aiml` SET
-            `pattern`= :pattern,
-            `thatpattern`= :thatpattern,
-            `template`= :template,
-            `topic`= :topic,
-            `filename`= :filename
-             WHERE `id`= :id LIMIT 1;';
+        $sql = 'UPDATE aiml SET
+            pattern= :pattern,
+            thatpattern= :thatpattern,
+            template= :template,
+            topic= :topic,
+            filename= :filename
+             WHERE id= :id;';
 
         $params = array(
             ':pattern' =>$pattern,
@@ -265,8 +265,8 @@ function insertAIML()
     else
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "INSERT INTO `aiml` (`id`,`bot_id`, `pattern`, `thatpattern`, `template`, `topic`, `filename`)
-                             values(NULL, :bot_id, :pattern,  :thatpattern,  :template,  :topic,  :filename)";
+        $sql = "INSERT INTO aiml (bot_id, pattern, thatpattern, template, topic, filename)
+                             values(:bot_id, :pattern,  :thatpattern,  :template,  :topic,  :filename)";
         $params = array(
             ':bot_id' =>$bot_id,
             ':pattern' =>$pattern,

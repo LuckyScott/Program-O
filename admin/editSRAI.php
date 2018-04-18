@@ -69,7 +69,7 @@ function delSRAI($id)
     if ($id != "")
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "DELETE FROM `srai_lookup` WHERE `id` = :id LIMIT 1";
+        $sql = "DELETE FROM srai_lookup WHERE id = :id";
         $params = array(':id' => $id);
         $affectedRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
 
@@ -119,7 +119,7 @@ function runSearch()
             $tmpSearch = str_replace('_', '\\_', $tmpSearch);
             $tmpSearch = str_replace('%', '\\$', $tmpSearch);
             $tmpName = $column['data'];
-            $addWhere = "`$tmpName` like '%$tmpSearch%'";
+            $addWhere = "$tmpName like '%$tmpSearch%'";
             $where[] = $addWhere;
         }
     }
@@ -150,13 +150,13 @@ function runSearch()
     }
 
     /** @noinspection SqlDialectInspection */
-    $countSQL = "SELECT count(id) FROM `srai_lookup` WHERE `bot_id` = ? AND ($searchTerms);";
+    $countSQL = "SELECT count(id) FROM srai_lookup WHERE bot_id = ? AND ($searchTerms);";
 
     $count = db_fetch($countSQL, $searchParams, __FILE__, __FUNCTION__, __LINE__);
-    $total = $count['count(id)'];
+    $total = $count['count'];
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT id, bot_id, pattern, template_id FROM `srai_lookup` " . "WHERE `bot_id` = $bot_id AND ($searchTerms) ORDER BY $orderBy limit $start, $length;";
+    $sql = "SELECT id, bot_id, pattern, template_id FROM srai_lookup " . "WHERE bot_id = $bot_id AND ($searchTerms) ORDER BY $orderBy limit $length offset $start;";
     //file_put_contents(_LOG_PATH_ . "editSRAI.runSearch.sql.txt", print_r($sql, true));
     $result = db_fetchAll($sql, $searchParams, __FILE__, __FUNCTION__, __LINE__);
 
@@ -227,7 +227,7 @@ function updateSRAI()
         );
 
         /** @noinspection SqlDialectInspection */
-        $sql = "UPDATE `srai_lookup` SET `bot_id` = :bot_id, `pattern` = :pattern, `template_id` = :template_id WHERE `id` = :id;";
+        $sql = "UPDATE srai_lookup SET bot_id = :bot_id, pattern = :pattern, template_id = :template_id WHERE id = :id;";
         $sth = $dbConn->prepare($sql);
 
         try {
@@ -268,7 +268,7 @@ function insertSRAI()
     $template_id = trim($form_vars['template_id']);
 
     /** @noinspection SqlDialectInspection */
-    $sql = 'INSERT INTO `srai_lookup` (`id`, `bot_id`, `pattern`, `template_id`) VALUES (NULL, :bot_id, :pattern, :template_id);';
+    $sql = 'INSERT INTO srai_lookup (bot_id, pattern, template_id) VALUES (:bot_id, :pattern, :template_id);';
     $params = array(
         ':bot_id' => $bot_id,
         ':pattern' => $pattern,
@@ -281,7 +281,7 @@ function insertSRAI()
     }
     else
     {
-        //$sth = $dbConn->prepare('INSERT INTO `srai_lookup` (`id`,`bot_id` `pattern`,`template_id`) VALUES (NULL, :bot_id, :pattern, :template_id);');
+        //$sth = $dbConn->prepare('INSERT INTO srai_lookup (bot_id pattern,template_id) VALUES (:bot_id, :pattern, :template_id);');
         $sth = $dbConn->prepare($sql);
 
         try {

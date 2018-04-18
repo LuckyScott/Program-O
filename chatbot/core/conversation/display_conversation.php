@@ -31,7 +31,7 @@ function get_conversation_to_display($convoArr)
     if (empty ($bot_name))
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT `bot_name` FROM `bots` WHERE `bot_id` = :bot_id limit 1;";
+        $sql = "SELECT bot_name FROM bots WHERE bot_id = :bot_id limit 1;";
         $params = array(':bot_id' => $convoArr['conversation']['bot_id']);
         $row = db_fetch($sql, $params, __FILE__, __FUNCTION__, __LINE__);
         $bot_name = $row['bot_name'];
@@ -45,10 +45,10 @@ function get_conversation_to_display($convoArr)
         $limit = "";
     }
 
-    $sql = "SELECT * FROM `$dbn`.`conversation_log` WHERE
-        `user_id` = :user_id
-        AND `bot_id` = :bot_id
-        AND `convo_id` = :convo_id
+    $sql = "SELECT * FROM $dbn.public.conversation_log WHERE
+        user_id = :user_id
+        AND bot_id = :bot_id
+        AND convo_id = :convo_id
         ORDER BY id DESC $limit";
     $params = array(
         ':bot_id'   => $convoArr['conversation']['bot_id'],

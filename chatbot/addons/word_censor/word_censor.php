@@ -41,7 +41,7 @@ function initialise_censor($bot_id)
     $_SESSION['pgo_word_censor'] = array();
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `$dbn`.`wordcensor` WHERE `bot_exclude` NOT LIKE '%[$bot_id]%'";
+    $sql = "SELECT * FROM $dbn.public.wordcensor WHERE bot_exclude NOT LIKE '%[$bot_id]%'";
     $result = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
 
     foreach ($result as $row)

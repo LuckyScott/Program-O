@@ -4,9 +4,9 @@
 -- Generation Time: [curDate]
 -- PHP Version: [phpVer]
 --
--- Database: `[dbn]`
+-- Database: [dbn]
 --
--- Data for table `aiml`
+-- Data for table aiml
 --
 -- File: [fileName]
 --
@@ -15,5 +15,5 @@
 -- SQL Query: [sql]
 
 -- --------------------------------------------------------
-insert into aiml (id,bot_id,aiml,pattern,thatpattern,template,topic,filename) values
+insert into aiml (bot_id,aiml,pattern,thatpattern,template,topic,filename) values
 

@@ -112,7 +112,7 @@ function load_default_bot_values($convoArr)
 
     //set in global config file
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `$dbn`.`botpersonality` WHERE `bot_id` = :bot_id;";
+    $sql = "SELECT * FROM $dbn.public.botpersonality WHERE bot_id = :bot_id;";
     $params = array(':bot_id' => $bot_id);
     $debugSQL = db_parseSQL($sql, $params);
     runDebug(__FILE__, __FUNCTION__, __LINE__, "load db bot personality values SQL: $debugSQL", 3);
@@ -342,7 +342,7 @@ function load_bot_config($convoArr)
     //get the values from the db
     $bot_id = $convoArr['conversation']['bot_id'];
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `$dbn`.`bots` WHERE bot_id = :bot_id;";
+    $sql = "SELECT * FROM $dbn.public.bots WHERE bot_id = :bot_id;";
     $params = array(':bot_id' => $bot_id);
     $debugSQL = db_parseSQL($sql, $params);
     runDebug(__FILE__, __FUNCTION__, __LINE__, "load bot config SQL: $debugSQL", 3);
@@ -408,17 +408,15 @@ function log_conversation($convoArr)
     $bot_id = $convoArr['conversation']['bot_id'];
 
     /** @noinspection SqlDialectInspection */
-    $sql = "INSERT INTO `$dbn`.`conversation_log` (
-      `id` ,
-      `input` ,
-      `response` ,
-      `user_id` ,
-      `convo_id` ,
-      `bot_id` ,
-      `timestamp`
+    $sql = "INSERT INTO $dbn.public.conversation_log (
+      input ,
+      response ,
+      user_id ,
+      convo_id ,
+      bot_id ,
+      timestamp
     )
     VALUES (
-      NULL ,
       :usersay,
       :botsay,
       :user_id,
@@ -440,18 +438,18 @@ function log_conversation($convoArr)
     $numRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
 
     $cpSQL = <<<endSQL
-insert into `client_properties`
-    (`id`, `user_id`, `bot_id`, `name`, `value`)
-    values(null, :user_id, :bot_id, :name, :value)
-    on duplicate key update value=:value;
+insert into client_properties
+    (user_id, bot_id, name, value)
+    values(:user_id, :bot_id, :name, :value)
+    on conflict(id) do update set value=excluded.value;
 endSQL;
     $client_properties = $convoArr['client_properties'];
     $params = [];
     foreach ($client_properties as $key => $value)
     {
         $params[] = array(
-            ':bot_id' => $bot_id,
-            ':user_id' => $user_id,
+            ':bot_id' => intval($bot_id),
+            ':user_id' => intval($user_id),
             ':name' => $key,
             ':value' => $value,
         );
@@ -478,16 +476,16 @@ function log_conversation_state($convoArr)
 
     $serialise_convo = serialize(reduceConvoArr($convoArr));
     $user_id = $convoArr['conversation']['user_id'];
-    $sql_addon = (!empty ($user_name)) ? "`user_name` = '" . $user_name . "', " : '';
+    $sql_addon = (!empty ($user_name)) ? "user_name = '" . $user_name . "', " : '';
 
     /** @noinspection SqlDialectInspection */
-    $sql = "UPDATE `$dbn`.`users`
+    $sql = "UPDATE $dbn.public.users
                 SET
-                `state` = '$serialise_convo',
-                `last_update` = NOW(),
+                state = '$serialise_convo',
+                last_update = NOW(),
                 $sql_addon
-                `chatlines` = `chatlines`+1
-                WHERE `id` = '$user_id' LIMIT 1";
+                chatlines = chatlines+1
+                WHERE id = '$user_id'";
     runDebug(__FILE__, __FUNCTION__, __LINE__, "updating conversation state SQL: $sql", 3);
 
     $numRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
@@ -495,18 +493,18 @@ function log_conversation_state($convoArr)
     // Save client_properties to DB
     $bot_id = $convoArr['conversation']['bot_id'];
     $cpSQL = <<<endSQL
-insert into `client_properties`
-    (`id`, `user_id`, `bot_id`, `name`, `value`)
-    values(null, :user_id, :bot_id, :name, :value)
-    on duplicate key update value=:value;
+insert into client_properties
+    (user_id, bot_id, name, value)
+    values(:user_id, :bot_id, :name, :value)
+    on conflict(id) do update set value=excluded.value;
 endSQL;
     $client_properties = $convoArr['client_properties'];
     $params = [];
     foreach ($client_properties as $key => $value)
     {
         $params[] = array(
-            ':bot_id' => $bot_id,
-            ':user_id' => $user_id,
+            ':bot_id' => intval($bot_id),
+            ':user_id' => intval($user_id),
             ':name' => $key,
             ':value' => $value,
         );
@@ -531,7 +529,7 @@ function get_conversation_state($convoArr)
     $user_id = $convoArr['conversation']['user_id'];
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `$dbn`.`users` WHERE `id` = :user_id LIMIT 1";
+    $sql = "SELECT * FROM $dbn.public.users WHERE id = :user_id LIMIT 1";
     $params = array(':user_id' => $user_id);
     $debugSQL = db_parseSQL($sql, $params);
     runDebug(__FILE__, __FUNCTION__, __LINE__, "Getting conversation state SQL: $debugSQL", 3);
@@ -574,7 +572,7 @@ function check_set_bot($convoArr)
 
     //get the values from the db
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `$dbn`.`bots` WHERE bot_id = :bot_id AND `bot_active` = 1;";
+    $sql = "SELECT * FROM $dbn.public.bots WHERE bot_id = :bot_id AND bot_active = 1;";
     $params = array(':bot_id' => $bot_id);
     $debugSQL = db_parseSQL($sql, $params);
     runDebug(__FILE__, __FUNCTION__, __LINE__, "Making sure the bot exists. SQL = $debugSQL", 3);
@@ -660,7 +658,7 @@ function check_set_user($convoArr)
 
     // get initial user data
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `user_name`, `id`, `chatlines` FROM `$dbn`.`users` WHERE `session_id` = :convo_id limit 1;";
+    $sql = "SELECT user_name, id, chatlines FROM $dbn.public.users WHERE session_id = :convo_id limit 1;";
     $row = db_fetch($sql, array(':convo_id' => $convo_id), __FILE__, __FUNCTION__, __LINE__);
 
     if ($row === false)
@@ -677,10 +675,10 @@ function check_set_user($convoArr)
     }
 
     // get client properties for the user
-    $sql = "SELECT `name`, `value` FROM `$dbn`.`client_properties` WHERE `user_id` = :user_id AND `bot_id` = :bot_id;";
+    $sql = "SELECT name, value FROM $dbn.public.client_properties WHERE user_id = :user_id AND bot_id = :bot_id;";
     $params = array(
-        ':bot_id' => $bot_id,
-        ':user_id' => $user_id,
+        ':bot_id' => intval($bot_id),
+        ':user_id' => intval($user_id),
     );
     $debugSQL = db_parseSQL($sql, $params);
     runDebug(__FILE__, __FUNCTION__, __LINE__, "Loading client properties from the DB - sql:\n$debugSQL", 3);
@@ -756,7 +754,7 @@ function load_that($convoArr)
     $limit = $remember_up_to;
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `input`, `response` FROM `$dbn`.`conversation_log` WHERE `user_id` = :user_id AND `bot_id` = :bot_id ORDER BY `id` DESC limit $limit;"; // desc
+    $sql = "SELECT input, response FROM $dbn.public.conversation_log WHERE user_id = :user_id AND bot_id = :bot_id ORDER BY id DESC limit $limit;"; // desc
     $params = array(
         ':bot_id' => $bot_id,
         ':user_id' => $user_id

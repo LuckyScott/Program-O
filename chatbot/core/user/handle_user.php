@@ -42,7 +42,7 @@ function get_user_id($convoArr)
 
     //get undefined defaults from the db
     /** @noinspection SqlDialectInspection */
-    $sql = 'SELECT * FROM `$dbn`.`users` WHERE `session_id` = :convo_id limit 1;';
+    $sql = 'SELECT * FROM $dbn.public.users WHERE session_id = :convo_id limit 1;';
     $params = array(':convo_id' => $convoArr['conversation']['convo_id']);
     $result = db_fetchAll($sql, $params, __FILE__, __FUNCTION__, __LINE__);
     $count = count($result);
@@ -104,9 +104,9 @@ function intisaliseUser($convoArr)
     }
     /** @noinspection SqlDialectInspection */
     $sql = <<<endSQL
-INSERT INTO `users`
-        (`id`, `user_name`, `session_id`, `bot_id`, `chatlines`,`ip`, `referer`, `browser`, `date_logged_on` , `last_update`    , `state`)
- VALUES (NULL, :username  , :convo_id   , :bot_id , '0'        , :sa, :sr      , :sb      , CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ''     );
+INSERT INTO users
+        (user_name, session_id, bot_id, chatlines,ip, referer, browser, date_logged_on , last_update    , state)
+ VALUES (:username  , :convo_id   , :bot_id , '0'        , :sa, :sr      , :sb      , CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ''     );
 endSQL;
 
     $params = array(
@@ -132,8 +132,8 @@ endSQL;
 
     //add the username to the client properties....
     /** @noinspection SqlDialectInspection */
-    $sql = 'INSERT INTO `client_properties` (`id`,`user_id`,`bot_id`,`name`,`value`)
-  VALUES (NULL, :user_id, :bot_id, \'name\', :username);';
+    $sql = 'INSERT INTO client_properties (user_id,bot_id,name,value)
+  VALUES (:user_id, :bot_id, \'name\', :username);';
 
     $params = array(
         ':user_id' => $user_id,

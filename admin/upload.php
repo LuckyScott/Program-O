@@ -207,7 +207,7 @@ function parseAIML($fn, $aimlContent, $from_zip = false)
     if (isset ($post_vars['clearDB']))
     {
         /** @noinspection SqlDialectInspection */
-        $sql = "DELETE FROM `aiml`  WHERE `filename` = :filename AND bot_id = :bot_id";
+        $sql = "DELETE FROM aiml  WHERE filename = :filename AND bot_id = :bot_id";
         $params = array(':filename' => $fileName, ':bot_id' => $bot_id);
         $affectedRows = db_write($sql, $params, false, __FILE__, __FUNCTION__, __LINE__);
     }
@@ -215,8 +215,8 @@ function parseAIML($fn, $aimlContent, $from_zip = false)
 
     # Read new file into the XML parser
     /** @noinspection SqlDialectInspection */
-    $sql = 'INSERT INTO `aiml` (`id`, `bot_id`, `pattern`, `thatpattern`, `template`, `topic`, `filename`) VALUES
-    (NULL, :bot_id, :pattern, :that, :template, :topic, :fileName);';
+    $sql = 'INSERT INTO aiml (bot_id, pattern, thatpattern, template, topic, filename) VALUES
+    (:bot_id, :pattern, :that, :template, :topic, :fileName);';
 
     # Validate the incoming document
     /*******************************************************/
@@ -444,7 +444,7 @@ function getAIML_List()
     global $dbConn, $dbn, $bot_id;
     $out = "                  <!-- Start List of Currently Stored AIML files -->\n";
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT DISTINCT filename FROM `aiml` WHERE `bot_id` = :bot_id ORDER BY `filename`;";
+    $sql = "SELECT DISTINCT filename FROM aiml WHERE bot_id = :bot_id ORDER BY filename;";
     $params = array(':bot_id' => $bot_id);
     $result = db_fetchAll($sql, $params, __FILE__, __FUNCTION__, __LINE__);
 
@@ -474,7 +474,7 @@ function getBotList()
     $botOptions = '';
 
     /** @noinspection SqlDialectInspection */
-    $sql = 'SELECT `bot_name`, `bot_id` FROM `bots` ORDER BY `bot_id`;';
+    $sql = 'SELECT bot_name, bot_id FROM bots ORDER BY bot_id;';
     $result = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
 
     foreach ($result as $row)

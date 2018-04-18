@@ -14,15 +14,15 @@ STEP 1:
 ----------------------------------------------------------------------------------------------
 - run the following sql on your bot database*
 ----------------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `wordcensor` (
-  `censor_id` int(11) NOT NULL auto_increment,
-  `word_to_censor` varchar(50) NOT NULL,
-  `replace_with` varchar(50) NOT NULL default '****',
-  `bot_exclude` varchar(255) NOT NULL,
-  PRIMARY KEY  (`censor_id`)
+CREATE TABLE IF NOT EXISTS wordcensor (
+  censor_id int(11) NOT NULL auto_increment,
+  word_to_censor varchar(50) NOT NULL,
+  replace_with varchar(50) NOT NULL default '****',
+  bot_exclude varchar(255) NOT NULL,
+  PRIMARY KEY  (censor_id)
 );
 
-INSERT INTO `wordcensor` (`censor_id`, `word_to_censor`, `replace_with`, `bot_exclude`) VALUES
+INSERT INTO wordcensor (censor_id, word_to_censor, replace_with, bot_exclude) VALUES
 (1, 'shit', 's***', ''),
 (2, 'crap', 'c***', '');
 

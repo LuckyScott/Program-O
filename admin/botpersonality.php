@@ -86,7 +86,7 @@ function getBot()
 
     //get the current bot's personality table from the db
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `botpersonality` WHERE  `bot_id` = :bot_id";
+    $sql = "SELECT * FROM botpersonality WHERE  bot_id = :bot_id";
     $params = array(':bot_id' => $bot_id);
 
     $rows = db_fetchAll($sql, $params, __FILE__, __FUNCTION__, __LINE__);
@@ -199,7 +199,7 @@ function updateBot()
         $newEntryValues = $post_vars['newEntryValue'];
 
         /** @noinspection SqlDialectInspection */
-        $sql = "INSERT INTO `botpersonality` (`id`, `bot_id`, `name`, `value`) VALUES (null, $bot_id, :name, :value);";
+        $sql = "INSERT INTO botpersonality (bot_id, name, value) VALUES ($bot_id, :name, :value);";
         $params = array();
 
         foreach ($newEntryNames as $index => $key)
@@ -225,7 +225,7 @@ function updateBot()
     }
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT * FROM `botpersonality` WHERE `bot_id` = :bot_id;";
+    $sql = "SELECT * FROM botpersonality WHERE bot_id = :bot_id;";
     $params = array(':bot_id' => $bot_id);
     $result = db_fetchAll($sql, $params, __FILE__, __FUNCTION__, __LINE__);
     $rows = array();
@@ -240,9 +240,9 @@ function updateBot()
     }
 
     /** @noinspection SqlDialectInspection */
-    $insertSQL = "INSERT INTO `botpersonality` (`id`, `bot_id`, `name`, `value`) VALUES (null, $bot_id, :name, :value);";
+    $insertSQL = "INSERT INTO botpersonality (bot_id, name, value) VALUES ($bot_id, :name, :value);";
     /** @noinspection SqlDialectInspection */
-    $updateSQL = "UPDATE `botpersonality` SET `value` = :value WHERE `id` = :id;";
+    $updateSQL = "UPDATE botpersonality SET value = :value WHERE id = :id;";
 
     $exclude = array('bot_id', 'func', 'action', 'newEntryName', 'newEntryValue');
     $values = '';
@@ -297,7 +297,7 @@ function addBotPersonality()
     $bot_id = $post_vars['bot_id'];
 
     /** @noinspection SqlDialectInspection */
-    $sql = "INSERT INTO `botpersonality` (`id`, `bot_id`, `name`, `value`) VALUES (null, $bot_id, :name, :value);";
+    $sql = "INSERT INTO botpersonality (bot_id, name, value) VALUES ($bot_id, :name, :value);";
     $msg = "";
     $params = array();
 

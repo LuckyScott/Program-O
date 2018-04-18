@@ -425,7 +425,7 @@ function run_srai(&$convoArr, $now_look_for_this)
         runDebug(__FILE__, __FUNCTION__, __LINE__,"google bot_id = $bot_id", 2);
         $lookingfor = $convoArr['aiml']['lookingfor'];
         //$now_look_for_this = _strtoupper($now_look_for_this);
-        $sql = "select `template_id` from `$dbn`.`srai_lookup` where `pattern` = '$now_look_for_this' and $sql_bot_select;";
+        $sql = "select template_id from $dbn.public.srai_lookup where pattern = '$now_look_for_this' and $sql_bot_select;";
         runDebug(__FILE__, __FUNCTION__, __LINE__,"lookup SQL = $sql", 2);
         $row = db_fetchAll($sql,null, __FILE__, __FUNCTION__, __LINE__);
         runDebug(__FILE__, __FUNCTION__, __LINE__, 'Result = ' . print_r($row, true), 2);
@@ -436,7 +436,7 @@ function run_srai(&$convoArr, $now_look_for_this)
           runDebug(__FILE__, __FUNCTION__, __LINE__,"Found $num_rows rows in lookup table: " . print_r($row, true), 2);
           $template_id = $row[0]['template_id'];
           runDebug(__FILE__, __FUNCTION__, __LINE__,"Found a matching entry in the lookup table. Using ID# $template_id.", 2);
-          $sql = "select `template` from `$dbn`.`aiml` where `id` = '$template_id';";
+          $sql = "select template from $dbn.public.aiml where id = '$template_id';";
           $row = db_fetch($sql,null, __FILE__, __FUNCTION__, __LINE__);
           runDebug(__FILE__, __FUNCTION__, __LINE__,"Row found in AIML for ID $template_id: " . print_r($row, true), 2);
           if (!empty($row))
@@ -465,7 +465,7 @@ function run_srai(&$convoArr, $now_look_for_this)
     */
 
     /** @noinspection SqlDialectInspection */
-    $sql = "SELECT `id`, `pattern`, `thatpattern`, `topic` FROM `$dbn`.`aiml` where `pattern` = :pattern and $sql_bot_select order by `id` asc;";
+    $sql = "SELECT id, pattern, thatpattern, topic FROM $dbn.public.aiml where pattern = :pattern and $sql_bot_select order by id asc;";
     $result = db_fetchAll($sql, array(':pattern' => $now_look_for_this), __FILE__, __FUNCTION__, __LINE__);
     $num_rows = count($result);
 
@@ -531,7 +531,7 @@ function run_srai(&$convoArr, $now_look_for_this)
         $pattern = $allrows['pattern'];
 
         /** @noinspection SqlDialectInspection */
-        $sql = "SELECT `template` FROM `$dbn`.`aiml` WHERE `id` = :id limit 1;";
+        $sql = "SELECT template FROM $dbn.public.aiml WHERE id = :id limit 1;";
         $row = db_fetch($sql, array(':id' => $aiml_id), __FILE__, __FUNCTION__, __LINE__);
         $template = add_text_tags($row['template']);
 
@@ -552,7 +552,7 @@ function run_srai(&$convoArr, $now_look_for_this)
         {
             // code to try here
             /** @noinspection SqlDialectInspection */
-            $sql = "INSERT INTO `$dbn`.`srai_lookup` (`id`, `bot_id`, `pattern`, `template_id`) VALUES(null, :bot_id, :pattern, :template_id);";
+            $sql = "INSERT INTO $dbn.public.srai_lookup (bot_id, pattern, template_id) VALUES(:bot_id, :pattern, :template_id);";
             $sth = $dbConn->prepare($sql);
             $sth->bindValue(':bot_id', $bot_id);
             $sth->bindValue(':pattern', $pattern);
@@ -699,9 +699,10 @@ function make_learn($convoArr, $pattern, $template)
     $bot_id = $convoArr['conversation']['bot_id'];
 
     /** @noinspection SqlDialectInspection */
-    $sql = "INSERT INTO `$dbn`.`aiml_userdefined`
+    $sql = "INSERT INTO $dbn.public.aiml_userdefined
+        (pattern, thatpattern, template, user_id, bot_id, date)
         VALUES
-        (NULL, '$aiml','$pattern','$template','$convo_id','$bot_id',NOW())";
+        ('$aiml','$pattern','$template','$convo_id','$bot_id',NOW())";
 
     runDebug(__FILE__, __FUNCTION__, __LINE__, "Make learn SQL: $sql", 3);
 
